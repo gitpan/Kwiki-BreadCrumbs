@@ -1,12 +1,9 @@
 package Kwiki::BreadCrumbs;
-use strict;
-use warnings;
-use Kwiki::Plugin '-Base', '-XXX';
+use Kwiki::Plugin -Base;
 use mixin 'Kwiki::Installer';
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 const class_id => 'bread_crumbs';
-const class_title => 'Bread Crumbs';
 
 field trail => [];
 
@@ -19,7 +16,8 @@ sub init {
         @$bread_crumbs = grep { $_ ne $page_id } @$bread_crumbs;
         unshift @$bread_crumbs, $page_id;
     }
-    splice @$bread_crumbs, 10;
+    splice @$bread_crumbs, 10
+      if @$bread_crumbs > 10;
     $self->trail($bread_crumbs);
     $self->hub->cookie->jar->{bread_crumbs} = $bread_crumbs;
 }
@@ -51,15 +49,20 @@ sub show_bread_crumbs {
 
 sub html {
     my @trail = @{$self->trail};
-    splice @trail, $self->preferences->show_bread_crumbs->value;
+    my $show = $self->preferences->show_bread_crumbs->value;
+    splice @trail, $show
+      if @trail > $show;
     my $script_name = $self->config->script_name;
+    my $pages = $self->hub->pages;
     "<hr />" . join ' &lt; ',
     map {
-        qq{<a href="$script_name?$_">$_</a>\n}
+        my $page = $pages->new_page($_);
+        sprintf "<a href=\"%s?%s\">%s</a>\n",
+          $script_name,
+          $page->uri,
+          $page->title;
     } @trail;
 }
-
-1;
 
 __DATA__
 
