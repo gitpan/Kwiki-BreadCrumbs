@@ -1,7 +1,7 @@
 package Kwiki::BreadCrumbs;
 use Kwiki::Plugin -Base;
 use mixin 'Kwiki::Installer';
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 const class_id => 'bread_crumbs';
 
@@ -97,5 +97,5 @@ div#bread_crumb_trail {
 }
 </style>
 <div id="bread_crumb_trail">
-[% hub.load_class('bread_crumbs').html %]
+[% hub.bread_crumbs.html %]
 </div>
